@@ -2,20 +2,40 @@ const uri = 'api/TodoItems';
 let todos = [];
 
 function getItems() {
-  fetch(uri)
-    .then(response => response.json())
-    .then(data => _displayItems(data))
-    .catch(error => console.error('Unable to get items.', error));
+  var xhttp = new XMLHttpRequest();
+  console.log("getItems");
+  xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        data = JSON.parse(this.responseText);
+        data.forEach(item => {
+          _displayItems(item);
+        });
+      }
+  };
+  xhttp.open("GET", uri, true);
+  xhttp.send();
 }
 
 function addItem() {
   const addNameTextbox = document.getElementById('add-name');
-
   const item = {
     isComplete: false,
     name: addNameTextbox.value.trim()
   };
+  const objEnviar=JSON.stringify(item);
+  console.log(objEnviar);
+  const xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 201) {
+      getItems();
+    
+    }
+    };
+  xhttp.open("POST",uri);
+  xhttp.setRequestHeader("Content-Type","application/json");
+  xhttp.send(objEnviar);
 
+/*
   fetch(uri, {
     method: 'POST',
     headers: {
@@ -38,6 +58,7 @@ function deleteItem(id) {
   })
   .then(() => getItems())
   .catch(error => console.error('Unable to delete item.', error));
+   */
 }
 
 function displayEditForm(id) {
@@ -55,8 +76,9 @@ function updateItem() {
     id: parseInt(itemId, 10),
     isComplete: document.getElementById('edit-isComplete').checked,
     name: document.getElementById('edit-name').value.trim()
+    
   };
-
+   /*
   fetch(`${uri}/${itemId}`, {
     method: 'PUT',
     headers: {
@@ -67,6 +89,23 @@ function updateItem() {
   })
   .then(() => getItems())
   .catch(error => console.error('Unable to update item.', error));
+
+  closeInput();
+
+  return false;
+  */
+  const objEnviar=JSON.stringify(item);
+  console.log(objEnviar);
+  const xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 204) {
+      getItems();
+    }
+    };
+  xhttp.open("PUT",uri+"/"+itemId);
+  xhttp.setRequestHeader("Content-Type","application/json");
+  xhttp.send(objEnviar);
+
 
   closeInput();
 
